@@ -92,8 +92,11 @@ namespace AutoGlassBack.Controllers
                 var FechaFabrica = producto.Fecha_fabrica;
                 var FechaValida = producto.Fecha_valida;
                 
-                if (FechaFabrica >= FechaValida) 
-                    return BadRequest(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
+                if (FechaFabrica >= FechaValida)
+                {
+                    string rta = JsonConvert.SerializeObject(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
+                    return BadRequest(rta);
+                } 
 
                 _context.Add(producto);
                 await _context.SaveChangesAsync();
@@ -120,12 +123,17 @@ namespace AutoGlassBack.Controllers
 
                 var FechaFabrica = DateTime.Parse(producto.Fecha_fabrica.ToString());
                 var FechaValida = DateTime.Parse(producto.Fecha_valida.ToString());
-                if ( FechaFabrica >= FechaValida) return BadRequest(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
+                if (FechaFabrica >= FechaValida)
+                {
+                    string rta = JsonConvert.SerializeObject(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
+                    return BadRequest(rta);
+                }
 
                 _context.Update(producto);
                 await _context.SaveChangesAsync();
 
-                return Ok(new { mensaje = "Producto actualizado exitosamente" });
+                string rtaMsj = JsonConvert.SerializeObject(new { mensaje = "Producto actualizado exitosamente" });
+                return Ok(rtaMsj);
             }
             catch (Exception ex)
             {
@@ -150,8 +158,8 @@ namespace AutoGlassBack.Controllers
                 resut.Estado_producto = "Inactivo";
                 _context.Update(resut);
                 await _context.SaveChangesAsync();
-
-                return Ok(new { mensaje = "Producto eliminado correctamente" });
+                string rta = JsonConvert.SerializeObject(new { mensaje = "Producto eliminado correctamente" });
+                return Ok(rta);
 
             }
             catch (Exception ex)

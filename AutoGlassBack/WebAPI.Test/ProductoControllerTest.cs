@@ -8,11 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -49,7 +46,7 @@ namespace WebAPI.Test
             var contexto = Conexion(nombreBd);
             var mapper = ConfigurationAutoMapper();
 
-            contexto.Producto.Add(new Producto() 
+            contexto.Producto.Add(new Producto()
             {
                 Codigo_producto = 1,
                 Descripcion_producto = "parabrisa trasero",
@@ -71,14 +68,15 @@ namespace WebAPI.Test
                 Descripcion_proveedor = "Autoglass",
                 Telefono_proveedor = "456789"
             });
-            contexto.Producto.Add(new Producto() { 
+            contexto.Producto.Add(new Producto()
+            {
                 Codigo_producto = 3,
                 Descripcion_producto = "parabrisa delantero",
                 Estado_producto = "Activo",
                 Fecha_fabrica = DateTime.Now,
                 Fecha_valida = DateTime.Now.AddDays(1),
                 Codigo_proveedor = 3,
-                Descripcion_proveedor= "Autoglass",
+                Descripcion_proveedor = "Autoglass",
                 Telefono_proveedor = "456789"
             });
 
@@ -145,7 +143,7 @@ namespace WebAPI.Test
 
             //Prueba
             var controller = new ProductoController(contexto2, mapper);
-            
+
             var respuesta = await controller.GetCodProducto(1);
 
             //Verificacion
@@ -218,9 +216,11 @@ namespace WebAPI.Test
             //Verificacion
             Assert.NotNull(respuesta);
             ObjectResult objectResult = (ObjectResult)respuesta;
+            var rtaMsj = JsonConvert.DeserializeObject<Dictionary<string, object>>(objectResult.Value.ToString());
+            rtaMsj["mensaje"].Should().Be("Incorrecta la fecha fabricación o fecha vencimiento");
             objectResult.StatusCode.Should().Be(400);
         }
-        
+
         [Fact]
         public async Task EditarProducto()
         {
@@ -253,6 +253,8 @@ namespace WebAPI.Test
             //Verificacion
             Assert.NotNull(respuesta);
             ObjectResult objectResult = (ObjectResult)respuesta;
+            var rtaMsj = JsonConvert.DeserializeObject<Dictionary<string, object>>(objectResult.Value.ToString());
+            rtaMsj["mensaje"].Should().Be("Producto actualizado exitosamente");
             objectResult.StatusCode.Should().Be(200);
         }
 
@@ -289,6 +291,8 @@ namespace WebAPI.Test
             Assert.NotNull(respuesta);
 
             ObjectResult objectResult = (ObjectResult)respuesta;
+            var rtaMsj = JsonConvert.DeserializeObject<Dictionary<string, object>>(objectResult.Value.ToString());
+            rtaMsj["mensaje"].Should().Be("Incorrecta la fecha fabricación o fecha vencimiento");
             objectResult.StatusCode.Should().Be(400);
         }
 
@@ -324,7 +328,9 @@ namespace WebAPI.Test
             //Verificacion
             Assert.NotNull(respuesta);
             ObjectResult objectResult = (ObjectResult)respuesta;
-            objectResult.StatusCode.Should().Be(200);
+            var rtaMsj = JsonConvert.DeserializeObject<Dictionary<string, object>>(objectResult.Value.ToString());
+            rtaMsj["mensaje"].Should().Be("Producto eliminado correctamente");
+            //objectResult.StatusCode.Should().Be(200);
         }
     }
 }
