@@ -4,6 +4,7 @@ using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -22,14 +23,14 @@ namespace AutoGlassBack.Controllers
             this.mapper = mapper;
         }
 
-        // GET api/<ProductoController>/5
+        // GET api/Producto/5
         /// <summary>
         /// Recuperar los registros por codigo producto
         /// </summary>
         /// <param name="CodigoProducto"></param>
         /// <returns></returns>
         [HttpGet("{CodigoProducto}")]
-        public async Task<IActionResult> Get(int CodigoProducto)
+        public async Task<IActionResult> GetCodProducto(int CodigoProducto)
         {
             try
             {
@@ -46,7 +47,7 @@ namespace AutoGlassBack.Controllers
         /// Lista de los productos registrados
         /// </summary>
         /// <returns></returns>
-        // GET: api/<ProductoController>
+        // GET: api/Producto
         [HttpGet]
         public async Task<IActionResult> GetProductos()
         {
@@ -84,13 +85,15 @@ namespace AutoGlassBack.Controllers
         /// </summary>
         /// <param name="value"></param>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Producto producto)
+        public async Task<IActionResult> InsertarProducto([FromBody] Producto producto)
         {
             try
             {
-                var FechaFabrica = DateTime.Parse(producto.Fecha_fabrica.ToString());
-                var FechaValida = DateTime.Parse(producto.Fecha_valida.ToString());
-                if (FechaFabrica >= FechaValida) return BadRequest(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
+                var FechaFabrica = producto.Fecha_fabrica;
+                var FechaValida = producto.Fecha_valida;
+                
+                if (FechaFabrica >= FechaValida) 
+                    return BadRequest(new { mensaje = "Incorrecta la fecha fabricación o fecha vencimiento" });
 
                 _context.Add(producto);
                 await _context.SaveChangesAsync();
@@ -109,7 +112,7 @@ namespace AutoGlassBack.Controllers
         /// <param name="id"></param>
         /// <param name="producto"></param>
         [HttpPut("{CodigoProducto}")]
-        public async Task<IActionResult> Put(int CodigoProducto, [FromBody] Producto producto)
+        public async Task<IActionResult> EditarProductoByCodigo(int CodigoProducto, [FromBody] Producto producto)
         {
             try
             {
@@ -126,18 +129,18 @@ namespace AutoGlassBack.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return NotFound(ex.Message);
             }
         }
 
-        // DELETE api/<ProductoController>/5
+        // DELETE api/Producto/5
         /// <summary>
         /// Borrar un producto
         /// </summary>
         /// <param name="CodigoProducto"></param>
         /// <returns></returns>
         [HttpDelete("{CodigoProducto}")]
-        public async Task<IActionResult> Delete(int CodigoProducto)
+        public async Task<IActionResult> BorrarProducto(int CodigoProducto)
         {
             try
             {
@@ -146,7 +149,6 @@ namespace AutoGlassBack.Controllers
                 if (resut == null) return NotFound();
                 resut.Estado_producto = "Inactivo";
                 _context.Update(resut);
-                //_context.Remove(resut);
                 await _context.SaveChangesAsync();
 
                 return Ok(new { mensaje = "Producto eliminado correctamente" });
